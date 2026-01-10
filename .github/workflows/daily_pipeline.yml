@@ -1,0 +1,70 @@
+name: Futures Prediction Pipeline
+
+on:
+  schedule:
+    # GitHub 使用 UTC 时间。
+    # 北京时间 22:30 = UTC 14:30
+    - cron: '30 14 * * *'
+  workflow_dispatch: # 允许你在 GitHub 网页上手动点按钮触发测试
+
+jobs:
+  # === 第一阶段：数据工程 ===
+  data_engineering:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 1. Fetch Data (RSS, CCTV, Prices)
+        env:
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+          # 显式声明时区，确保日志时间正确
+          TZ: 'Asia/Shanghai'
+        run: python data_pipeline/fetch_data.py
+
+      - name: 2. Merge News
+        env:
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+        run: python data_pipeline/merge_process.py
+
+      - name: 3. Score Sentiment
+        env:
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+        run: python data_pipeline/score_sentiment.py
+
+      - name: 4. Align Data
+        env:
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+        run: python data_pipeline/align_model_data.py
+
+  # === 第二阶段：模型推理 (仅当数据阶段成功时运行) ===
+  model_inference:
+    needs: data_engineering
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: 5. Run Prediction
+        env:
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+          TZ: 'Asia/Shanghai'
+        run: python model_inference/predict.py

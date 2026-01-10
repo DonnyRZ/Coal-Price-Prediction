@@ -1,0 +1,82 @@
+# ====================
+# 1. 核心安全 (绝对不能提交)
+# ====================
+# GCP 密钥文件 (这是最重要的！)
+service_account_key.json
+*.json
+!app.json  # 如果你有其他非敏感的 config json，可以用 ! 排除忽略
+
+# 环境变量文件
+.env
+.env.local
+
+# ====================
+# 2. Python 环境与缓存
+# ====================
+# 编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境 (兼容常见命名)
+.venv/
+venv/
+env/
+ENV/
+
+# 包分发文件
+build/
+dist/
+*.egg-info/
+
+# ====================
+# 3. 操作系统文件
+# ====================
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# ====================
+# 4. 数据文件 (Data Pipeline 产物)
+# ====================
+# 忽略所有本地生成的 CSV 数据 (避免污染仓库，且数据已上云)
+*.csv
+*.xlsx
+*.xls
+
+# 特例：如果你有必须提交的示例数据，可以用 ! 强制保留
+# !data_pipeline/example_data.csv
+
+# 日志文件
+*.log
+
+# ====================
+# 5. IDE 配置 (可选)
+# ====================
+# VS Code
+.vscode/
+
+# JetBrains (PyCharm)
+.idea/
+
+# ====================
+# 6. 模型文件 (策略控制)
+# ====================
+# 通常大模型(>100MB)不建议直接放git，但你的模型较小，需要部署，所以保留
+# 这里忽略训练过程中的临时 checkpoints 文件夹
+gru_elite_models/
+checkpoints/
+
+# 确保保留用于推理的最终文件 (虽然默认不忽略，但显式写出来更清晰)
+!model_inference/best_gru_model.pth
+!model_inference/scaler.pkl
+
+# ====================
+# 7. 其他
+# ====================
+# 忽略 PyTest 缓存
+.pytest_cache/
+# 忽略 Jupyter Notebook 的 checkpoint
+.ipynb_checkpoints/
