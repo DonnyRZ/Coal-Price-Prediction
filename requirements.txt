@@ -12,6 +12,7 @@ selenium
 beautifulsoup4
 lxml
 feedparser  # <--- 新增：用于解析 RSS 新闻源
+jieba
 
 # === Google Sheets 连接 ===
 gspread
