@@ -1,5 +1,4 @@
 # === 深度学习与科学计算 ===
-# 你的模型依赖
 torch
 pandas
 numpy
@@ -7,18 +6,16 @@ scikit-learn
 joblib
 
 # === 数据获取与爬虫 ===
-# 这里的 akshare 和 selenium 会自动拉取适配的 urllib3
 akshare
 requests
 selenium
 beautifulsoup4
 lxml
+feedparser  # <--- 新增：用于解析 RSS 新闻源
 
 # === Google Sheets 连接 ===
-# 用于 gsheet_manager.py
 gspread
 oauth2client
 
 # === 绘图工具 ===
-# 如果你的后端脚本涉及生成那张 performance 图
 matplotlib
