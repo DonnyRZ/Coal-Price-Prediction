@@ -1,0 +1,13 @@
+# version: '3.8'
+
+services:
+  coal-dashboard:
+    container_name: coal-dashboard
+    build: .
+    restart: always
+    ports:
+      - "8504:8501"  # 👈 核心修改：左边改成 8504 (VPS端口)，右边保持 8501 (Streamlit默认)
+    volumes:
+      - ./service_account_key.json:/app/service_account_key.json
+    environment:
+      - TZ=Asia/Shanghai
