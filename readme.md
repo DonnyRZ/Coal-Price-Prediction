@@ -63,21 +63,18 @@ futures-prediction-backend/
 ├── requirements.txt        # Python 依赖
 └── README.md               # 项目说明
 
+```
+
 # 🚀 快速开始 (Quick Start)
 
 ### 1. 环境准备
 确保本地已安装 Python 3.9+ 环境。
 
-```bash
-# 1. 克隆仓库
-git clone [https://github.com/your-username/futures-prediction-backend.git](https://github.com/your-username/futures-prediction-backend.git)
-cd futures-prediction-backend
+### 2. 克隆仓库
 
-# 2. 安装依赖
-pip install -r requirements.txt
+### 3. 安装依赖
 
-
-# 3. 配置密钥 (Local Debug)
+### 4. 配置密钥 (Local Debug)
 本项目依赖 Google Sheets API。
 
 在 Google Cloud Platform 申请 Service Account。
@@ -86,7 +83,7 @@ pip install -r requirements.txt
 
 将该文件放入项目根目录（注意：该文件已在 .gitignore 中，切勿上传到 GitHub）。
 
-# 4. 运行脚本
+### 5. 运行脚本
 你可以单独运行某个模块，建议在根目录下执行：
 
 
@@ -105,6 +102,7 @@ python data_pipeline/align_model_data.py
 
 # 5. 模型推理
 python model_inference/predict.py
+```
 
 # ☁️ 部署 (Deployment)
 本项目配置了 GitHub Actions，实现每日自动化运行。
