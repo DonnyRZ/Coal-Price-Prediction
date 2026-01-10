@@ -190,3 +190,32 @@ if not df.empty:
 
 else:
     st.info("☁️ 暂无数据")
+
+# ================= 5. 项目文档 (README) =================
+st.markdown("---")
+
+# 使用折叠面板，默认收起，保持页面整洁
+with st.expander("📖 关于模型架构与策略逻辑 (About Model)", expanded=False):
+    readme_path = os.path.join(current_dir, "front_page_readme.md")
+    
+    try:
+        with open(readme_path, "r", encoding="utf-8") as f:
+            readme_content = f.read()
+        
+        # 渲染 Markdown
+        st.markdown(readme_content)
+        
+    except FileNotFoundError:
+        st.warning("⚠️ 未找到 front_page_readme.md 文件。请确保该文件位于项目根目录。")
+    except Exception as e:
+        st.error(f"无法加载文档: {str(e)}")
+
+# 页脚签名
+st.markdown(
+    """
+    <div style='text-align: center; color: grey; font-size: 0.8em; margin-top: 30px;'>
+        Coal AI Alpha System | Powered by GRU-Attention & NLP | Deployed via Docker & GitHub Actions
+    </div>
+    """,
+    unsafe_allow_html=True
+)
