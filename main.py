@@ -77,6 +77,9 @@ def load_data_direct():
 
 # ================= 3. 侧边栏 =================
 with st.sidebar:
+    # [新增] 返回主站链接
+    st.markdown("[⬅️ 返回主站 (nice-ai.dev)](https://nice-ai.dev)")
+
     st.title("🔮 Coal AI Alpha")
     st.markdown("---")
     
@@ -193,7 +196,20 @@ else:
 
 # ================= 5. 项目文档 (README) =================
 st.markdown("---")
+# [新增] GitHub 仓库链接 (使用 Shields.io 徽章风格)
+# 🚨 请将下方的链接替换为你真实的 GitHub 仓库地址
+GITHUB_REPO_URL = "https://github.com/dachou5224/coal-price-prediction"
 
+st.markdown(
+    f"""
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="{GITHUB_REPO_URL}" target="_blank" style="text-decoration: none;">
+            <img src="https://img.shields.io/badge/GitHub-View_Source_Code-181717?style=for-the-badge&logo=github" alt="GitHub Repo">
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 # 使用折叠面板，默认收起，保持页面整洁
 with st.expander("📖 关于模型架构与策略逻辑 (About Model)", expanded=False):
     readme_path = os.path.join(current_dir, "front_page_readme.md")
