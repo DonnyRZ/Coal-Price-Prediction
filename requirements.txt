@@ -4,6 +4,7 @@ pandas
 numpy
 scikit-learn
 joblib
+streamlit
 
 # === 数据获取与爬虫 ===
 akshare
