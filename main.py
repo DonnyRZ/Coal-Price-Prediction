@@ -14,7 +14,7 @@ from utils.gsheet_manager import get_client
 
 # ================= 1. 页面配置 =================
 st.set_page_config(
-    page_title="Coal AI | 焦煤策略看板",
+    page_title="Coal AI | Coal Futures Dashboard",
     page_icon="🔮",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -77,33 +77,32 @@ def load_data_direct():
 
 # ================= 3. 侧边栏 =================
 with st.sidebar:
-    # [新增] 返回主站链接
-    st.markdown("[⬅️ 返回主站 (nice-ai.dev)](https://nice-ai.dev)")
+    st.markdown("[⬅️ Back to main site (nice-ai.dev)](https://nice-ai.dev)")
 
     st.title("🔮 Coal AI Alpha")
     st.markdown("---")
-    
-    st.subheader("🤖 模型参数")
-    st.info("**架构**: GRU + Attention")
+
+    st.subheader("🤖 Model Settings")
+    st.info("**Architecture**: GRU + Attention")
     st.caption("Lookback: 10 Days | Data: 2023-2025")
-    
+
     st.markdown("---")
-    
-    st.subheader("📖 图表解读")
+
+    st.subheader("📖 Chart Guide")
     st.markdown("""
-    **双轴叠加图：**
-    1. **折线 (左轴)**: 价格走势
-       - 🔘 灰色: 真实价格
-       - 🔴 红色: AI 目标价
-    2. **柱状 (右轴)**: 趋势动量
-       - 📊 柱子越高，模型追涨/杀跌的力度越大。
-       - **红柱**: 动量向上 (Bullish)
-       - **绿柱**: 动量向下 (Bearish)
+    **Dual-axis overlay:**
+    1. **Lines (left axis)**: Price trend
+       - 🔘 Gray: Actual price
+       - 🔴 Red: AI target
+    2. **Bars (right axis)**: Momentum
+       - 📊 Taller bars mean stronger momentum.
+       - **Red**: Bullish momentum
+       - **Green**: Bearish momentum
     """)
     st.caption(f"Update: {datetime.now().strftime('%H:%M:%S')}")
 
 # ================= 4. 主界面 =================
-st.title("焦煤期货 (JM) 智能策略看板")
+st.title("Coal Futures (JM) Intelligent Strategy Dashboard")
 
 df = load_data_direct()
 
@@ -115,24 +114,32 @@ if not df.empty:
     # --- KPI ---
     cols = st.columns(5)
     with cols[0]:
-        st.metric("目标日期", latest['predict_date'].strftime('%Y-%m-%d'))
+        st.metric("Target Date", latest['predict_date'].strftime('%Y-%m-%d'))
     with cols[1]:
-        st.metric("基准价", f"{latest['current_price']:.0f}")
+        st.metric("Base Price", f"{latest['current_price']:.0f}")
     with cols[2]:
         delta_pred = latest['predicted_price'] - prev['predicted_price']
-        st.metric("AI 目标价", f"{latest['predicted_price']:.1f}", delta=f"{delta_pred:+.1f}")
+        st.metric("AI Target", f"{latest['predicted_price']:.1f}", delta=f"{delta_pred:+.1f}")
     with cols[3]:
-        st.metric("趋势动量", f"{slope_val:+.1f}", delta=None)
+        st.metric("Momentum", f"{slope_val:+.1f}", delta=None)
     with cols[4]:
         base_signal = str(latest['signal'])
-        color = "red" if "看涨" in base_signal else "green"
-        st.markdown("**最终信号**")
-        st.markdown(f":{color}[**{base_signal}**]")
+        if "看涨" in base_signal:
+            display_signal = "Bullish (Long)"
+            color = "red"
+        elif "看跌" in base_signal:
+            display_signal = "Bearish (Short)"
+            color = "green"
+        else:
+            display_signal = base_signal
+            color = "blue"
+        st.markdown("**Final Signal**")
+        st.markdown(f":{color}[**{display_signal}**]")
 
     st.markdown("---")
 
     # --- 核心图表区 ---
-    tab1, tab2 = st.tabs(["📉 趋势与动量 (叠加)", "📊 历史回测"])
+    tab1, tab2 = st.tabs(["📉 Trend & Momentum (Overlay)", "📊 Backtest"])
 
     with tab1:
         if len(df) > 1:
@@ -182,17 +189,17 @@ if not df.empty:
             st.pyplot(fig)
             
         else:
-            st.info("数据积累中，暂无趋势图。")
+            st.info("Not enough data yet to display the trend chart.")
 
     with tab2:
         img_path = "assets/model_performance_report.png"
         if os.path.exists(img_path):
             st.image(img_path, use_container_width=True)
         else:
-            st.warning("未找到回测报告图片")
+            st.warning("Backtest image not found.")
 
 else:
-    st.info("☁️ 暂无数据")
+    st.info("☁️ No data available. Make sure Google Sheets access is configured and prediction_results has data.")
 
 # ================= 5. 项目文档 (README) =================
 st.markdown("---")
@@ -211,7 +218,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 # 使用折叠面板，默认收起，保持页面整洁
-with st.expander("📖 关于模型架构与策略逻辑 (About Model)", expanded=False):
+with st.expander("📖 About Model", expanded=False):
     readme_path = os.path.join(current_dir, "front_page_readme.md")
     
     try:
@@ -222,7 +229,7 @@ with st.expander("📖 关于模型架构与策略逻辑 (About Model)", expande
         st.markdown(readme_content)
         
     except FileNotFoundError:
-        st.warning("⚠️ 未找到 front_page_readme.md 文件。请确保该文件位于项目根目录。")
+        st.warning("⚠️ front_page_readme.md not found in the project root.")
     except Exception as e:
         st.error(f"无法加载文档: {str(e)}")
 
