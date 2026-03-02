@@ -40,7 +40,7 @@ def load_data_direct():
             return pd.DataFrame(), "GCP credentials not found. Check GCP_SERVICE_ACCOUNT_JSON."
 
         SHEET_NAME = "Coal_Data_Master"
-        TAB_NAME = "prediction_results_v2"
+        TAB_NAME = "prediction_results"
 
         try:
             sh = client.open(SHEET_NAME)

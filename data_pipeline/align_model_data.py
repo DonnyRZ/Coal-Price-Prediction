@@ -20,7 +20,7 @@ DICT_DIR = os.path.join(project_root, "sentiment_dicts")
 # ================= 配置 =================
 TAB_PRICES = "raw_prices"                  # 输入1：期货价格表
 TAB_SENTIMENT = "daily_features_for_model" # 输入2：情绪打分表
-TAB_FINAL = "final_model_input_v2"         # 输出：最终喂给模型的宽表 (v2 for safe rollout)
+TAB_FINAL = "final_model_input"            # 输出：最终喂给模型的宽表
 
 
 def _build_trading_calendar(df_price: pd.DataFrame) -> pd.DatetimeIndex:
@@ -59,6 +59,20 @@ def align_and_merge():
     df_sent["date"] = pd.to_datetime(df_sent["date"], errors="coerce")
     df_price = df_price.dropna(subset=["date"]).copy()
     df_sent = df_sent.dropna(subset=["date"]).copy()
+
+    # Coerce sentiment columns to numeric to avoid string aggregation issues.
+    for col in [
+        "sentiment_score",
+        "risk_score",
+        "future_score",
+        "conflict_score",
+        "news_count",
+    ]:
+        if col in df_sent.columns:
+            df_sent[col] = pd.to_numeric(df_sent[col], errors="coerce")
+    df_sent = df_sent.dropna(
+        subset=["sentiment_score", "risk_score", "future_score", "conflict_score", "news_count"]
+    )
 
     trading_calendar = _build_trading_calendar(df_price)
     if trading_calendar.empty:

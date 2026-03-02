@@ -15,8 +15,8 @@ sys.path.append(current_dir)
 from utils.gsheet_manager import read_from_sheet, write_to_sheet
 
 # ================= 配置 =================
-INPUT_TAB = "final_model_input_v2"
-OUTPUT_TAB = "prediction_results_v2"
+INPUT_TAB = "final_model_input"
+OUTPUT_TAB = "prediction_results"
 MODEL_PATH = "model_inference/best_gru_model.pth"
 SCALER_PATH = "model_inference/scaler.pkl"
 
