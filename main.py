@@ -32,48 +32,51 @@ COLOR_ACTUAL = '#333333' # 深灰
 COLOR_BAR_ALPHA = 0.25   # 柱状图透明度
 
 # ================= 2. 数据加载 =================
-@st.cache_data(ttl=0) 
+@st.cache_data(ttl=0)
 def load_data_direct():
     try:
         client = get_client()
-        if not client: return pd.DataFrame()
+        if not client:
+            return pd.DataFrame(), "GCP credentials not found. Check GCP_SERVICE_ACCOUNT_JSON."
 
-        SHEET_NAME = "Coal_Data_Master" 
+        SHEET_NAME = "Coal_Data_Master"
         TAB_NAME = "prediction_results"
-        
+
         try:
             sh = client.open(SHEET_NAME)
             ws = sh.worksheet(TAB_NAME)
             raw_data = ws.get_all_values()
-        except Exception:
-            return pd.DataFrame()
+        except Exception as e:
+            return pd.DataFrame(), f"Failed to open sheet/tab: {e}"
 
-        if len(raw_data) < 2: return pd.DataFrame()
+        if len(raw_data) < 2:
+            return pd.DataFrame(), "prediction_results is empty."
 
         headers = [h.strip() for h in raw_data[0]]
         rows = raw_data[1:]
         df = pd.DataFrame(rows, columns=headers)
 
-        if 'predict_date' not in df.columns: return pd.DataFrame()
+        if "predict_date" not in df.columns:
+            return pd.DataFrame(), "prediction_results is missing 'predict_date' column."
 
-        # 类型转换
-        df['predict_date'] = pd.to_datetime(df['predict_date'])
-        
-        cols_num = ['current_price', 'predicted_price', 'change_pct']
+        # Type conversion
+        df["predict_date"] = pd.to_datetime(df["predict_date"])
+
+        cols_num = ["current_price", "predicted_price", "change_pct"]
         for c in cols_num:
             if c in df.columns:
-                df[c] = pd.to_numeric(df[c], errors='coerce')
-        
-        # 计算动量
-        df = df.sort_values('predict_date', ascending=True)
-        df['pred_slope'] = df['predicted_price'].diff()
-        
-        # 倒序返回
-        df = df.sort_values('predict_date', ascending=False)
-        return df
+                df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    except Exception:
-        return pd.DataFrame()
+        # Momentum
+        df = df.sort_values("predict_date", ascending=True)
+        df["pred_slope"] = df["predicted_price"].diff()
+
+        # Return latest first
+        df = df.sort_values("predict_date", ascending=False)
+        return df, ""
+
+    except Exception as e:
+        return pd.DataFrame(), f"Unexpected error: {e}"
 
 # ================= 3. 侧边栏 =================
 with st.sidebar:
@@ -104,7 +107,7 @@ with st.sidebar:
 # ================= 4. 主界面 =================
 st.title("Coal Futures (JM) Intelligent Strategy Dashboard")
 
-df = load_data_direct()
+df, load_error = load_data_direct()
 
 if not df.empty:
     latest = df.iloc[0]
@@ -199,7 +202,10 @@ if not df.empty:
             st.warning("Backtest image not found.")
 
 else:
-    st.info("☁️ No data available. Make sure Google Sheets access is configured and prediction_results has data.")
+    if load_error:
+        st.info(f"☁️ No data available. {load_error}")
+    else:
+        st.info("☁️ No data available. Make sure Google Sheets access is configured and prediction_results has data.")
 
 # ================= 5. 项目文档 (README) =================
 st.markdown("---")
