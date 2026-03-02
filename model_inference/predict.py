@@ -17,8 +17,8 @@ sys.path.append(project_root)
 from utils.gsheet_manager import read_from_sheet, write_to_sheet
 
 # ================= 配置 =================
-INPUT_TAB = "final_model_input"    # 包含 Open, Close, Sentiment, News_Count 等
-OUTPUT_TAB = "prediction_results" 
+INPUT_TAB = "final_model_input_v2"    # 包含 Open, Close, Sentiment, News_Count 等 (v2)
+OUTPUT_TAB = "prediction_results_v2"
 MODEL_PATH = os.path.join(current_dir, "best_gru_model.pth")
 SCALER_PATH = os.path.join(current_dir, "scaler.pkl")
 
